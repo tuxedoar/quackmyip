@@ -4,6 +4,11 @@
 
 This script allows you to keep your public IP address updated, when using the "duckdns" service. See: https://www.duckdns.org/ .  
 
+##### Requirements
+In order to work, the latest version of this little script, needs the following Python 3 libraries:
+* [requests](http://docs.python-requests.org/en/master/) (tested with v2.12.4)
+* [urllib3](https://urllib3.readthedocs.io/en/latest/)  (tested with v1.19.1)
+
 ##### Syntax
 ```
 usage: duckdns-update-ip.py [-h] -f FILE
