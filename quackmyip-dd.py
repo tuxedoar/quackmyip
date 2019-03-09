@@ -1,7 +1,7 @@
-#!/usr/bin/env python 
+#!/usr/bin/python3
 
 """
-Copyright 2017 by tuxedoar@gmail.com .
+Copyright 2019 by tuxedoar@gmail.com .
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -22,9 +22,9 @@ import argparse
 import requests
 import urllib
 from datetime import datetime
-from ConfigParser import SafeConfigParser
+from configparser import SafeConfigParser
 
-headers = {'user-agent': ' '}
+headers = {'user-agent': ''}
 url = {}
 DateTime = datetime.now().strftime('%Y/%m/%d %H:%M:%S')
 
@@ -36,10 +36,10 @@ def readConfigFile(iniFile):
     DOMAIN = parser.get('duckdns', 'domain')
     VERBOSE="true"
     URL_BASE="https://www.duckdns.org/update?"
-    PARAMS = urllib.urlencode({'domains': DOMAIN,'token': TOKEN,'verbose': VERBOSE})
+    PARAMS = urllib.parse.urlencode({'domains': DOMAIN,'token': TOKEN,'verbose': VERBOSE})
     url['url'] = URL_BASE+PARAMS
   else:
-    print "ERROR: Configuration file %s was not found!" % (iniFile)
+    print("ERROR: Configuration file %s was not found!" % (iniFile))
     raise SystemExit  
 
 def SendRequest(url):
@@ -48,28 +48,26 @@ def SendRequest(url):
     # Make a HTTP GET request
     r = requests.get(url, verify=True, headers=headers, timeout=3.0)
     response = r.text
-    # Convert unicode to ascii
-    response = response.encode('ascii','ignore')
     response_data.append(response)
     response_data = response_data[0].split('\n')
     # Filter empty strings in list
-    response_data = filter(None, response_data)
+    response_data = list(filter(None, response_data))
     # Assign a name for each element of response
     for element in response_data:
-	query_response, ip_addr, state = response_data[0], response_data[1], response_data[2]
+      query_response, ip_addr, state = response_data[0], response_data[1], response_data[2]
 
     if query_response == 'OK':
       if state == 'NOCHANGE':
-        print "%s - Your IP %s has not changed. Nothing to update!." % ( DateTime, ip_addr )
+        print("%s - Your IP %s has not changed. Nothing to update!." % (DateTime, ip_addr))
       elif state == 'UPDATED':
-        print "%s - Your IP has been updated!. Your new IP is: %s ." % (DateTime, ip_addr)
+        print("%s - Your IP has been updated!. Your new IP is: %s ." % (DateTime, ip_addr))
     elif query_response == 'KO':
-      print "ERROR: bad response recieved. Check your domain and token in your configuration file!."
+      print("ERROR: bad response recieved. Check your domain and token in your configuration file!.")
 
   except requests.exceptions.Timeout:
-    print "Timed out for request!."   
-  except requests.exceptions.ConnectionError, e:
-    print "Connection error: %s ." % (e)
+    print("Timed out for request!.")   
+  except requests.exceptions.ConnectionError as e:
+    print("Connection error: %s ." % (e))
 
 def GetArgs():
    parser = argparse.ArgumentParser(
@@ -87,4 +85,3 @@ def main():
 
 if __name__ == "__main__":
   main()
-
