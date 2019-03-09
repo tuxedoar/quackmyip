@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import argparse
 import requests
-import urllib
+from urllib.parse import urlencode
 from datetime import datetime
 from configparser import SafeConfigParser
 
@@ -36,7 +36,7 @@ def readConfigFile(iniFile):
     DOMAIN = parser.get('duckdns', 'domain')
     VERBOSE="true"
     URL_BASE="https://www.duckdns.org/update?"
-    PARAMS = urllib.parse.urlencode({'domains': DOMAIN,'token': TOKEN,'verbose': VERBOSE})
+    PARAMS = urlencode({'domains': DOMAIN,'token': TOKEN,'verbose': VERBOSE})
     url['url'] = URL_BASE+PARAMS
   else:
     print("ERROR: Configuration file %s was not found!" % (iniFile))
