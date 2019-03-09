@@ -1,6 +1,6 @@
-### quackmyip-dd.py
+**09-03-19, UPDATE:** This piece of code is not new!. It was just moved from "sysadmin_stuff" repo, to its own!. 
 
-**09-03-19, UPDATE:** This piece of code is not new!. It was just moved from "sysadmin_stuff" repo, to its own!.    
+### quackmyip-dd.py
 
 This script allows you to keep your public IP address updated, when using the "duckdns" service. See: https://www.duckdns.org/ .  
 
@@ -24,5 +24,3 @@ token = [YOUR_TOKEN]
 domain = [YOUR_DOMAIN]
 
 ```
-# quackmyip-dd
-Keep your IP address updated with the "duckdns" service!.
