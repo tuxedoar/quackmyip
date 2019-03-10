@@ -1,4 +1,4 @@
-**09-03-19, UPDATE:** This piece of code is not new!. It was just moved from "sysadmin_stuff" repo, to its own!. 
+**03-09-19, UPDATE:** This piece of code is not new!. It was just moved from "sysadmin_stuff" repo, to its own!. 
 
 ### quackmyip-dd.py
 
