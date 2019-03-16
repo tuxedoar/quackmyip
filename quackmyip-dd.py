@@ -18,70 +18,75 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
 
-import argparse
-import requests
 from urllib.parse import urlencode
 from datetime import datetime
 from configparser import SafeConfigParser
+import sys
+import argparse
+import requests
 
-headers = {'user-agent': ''}
-url = {}
-DateTime = datetime.now().strftime('%Y/%m/%d %H:%M:%S')
+HEADERS = {'user-agent': ''}
+URL = {}
+DATE_TIME = datetime.now().strftime('%Y/%m/%d %H:%M:%S')
 
-def readConfigFile(iniFile):
-  parser = SafeConfigParser()
-  # Check if config file exist
-  if parser.read(iniFile):
-    TOKEN = parser.get('duckdns', 'token')
-    DOMAIN = parser.get('duckdns', 'domain')
-    VERBOSE="true"
-    URL_BASE="https://www.duckdns.org/update?"
-    PARAMS = urlencode({'domains': DOMAIN,'token': TOKEN,'verbose': VERBOSE})
-    url['url'] = URL_BASE+PARAMS
-  else:
-    print("ERROR: Configuration file %s was not found!" % (iniFile))
-    raise SystemExit  
+def read_config_file(ini_file):
+    """ Read configuration file """
+    parser = SafeConfigParser()
+    # Check if config file exist
+    if parser.read(ini_file):
+        TOKEN = parser.get('duckdns', 'token')
+        DOMAIN = parser.get('duckdns', 'domain')
+        VERBOSE = "true"
+        URL_BASE = "https://www.duckdns.org/update?"
+        PARAMS = urlencode({'domains': DOMAIN, 'token': TOKEN, 'verbose': VERBOSE})
+        URL['url'] = URL_BASE+PARAMS
+    else:
+        print("\nERROR: Configuration file %s was not found!\n" % (ini_file))
+        raise SystemExit
 
-def SendRequest(url):
-  response_data = []
-  try:
-    # Make a HTTP GET request
-    r = requests.get(url, verify=True, headers=headers, timeout=3.0)
-    response = r.text
-    response_data.append(response)
-    response_data = response_data[0].split('\n')
-    # Filter empty strings in list
-    response_data = list(filter(None, response_data))
-    # Assign a name for each element of response
-    for element in response_data:
-      query_response, ip_addr, state = response_data[0], response_data[1], response_data[2]
+def send_request(URL):
+    """ Setup the HTTP request to duckdns """
+    response_data = []
+    try:
+        # Make a HTTP GET request
+        r = requests.get(URL, verify=True, headers=HEADERS, timeout=3.0)
+        response = r.text
+        response_data.append(response)
+        response_data = response_data[0].split('\n')
+        # Filter empty strings in list
+        response_data = list(filter(None, response_data))
+        # Assign a name for each element of response
+        if "OK" in response_data:
+            for element in response_data:
+                ip_addr, state = response_data[1], response_data[2]
+            # if query_response == 'OK':
+            if state == 'NOCHANGE':
+                print("\n%s - Your IP %s has not changed. Nothing to update!.\n" % (DATE_TIME, ip_addr))
+            elif state == 'UPDATED':
+                print("\n%s - Your IP has been updated!. Your new IP is: %s .\n" % (DATE_TIME, ip_addr))
+        # Assume query_response == 'KO':
+        else:
+            print("\nERROR: bad response recieved. Check your configuration file!.\n")
 
-    if query_response == 'OK':
-      if state == 'NOCHANGE':
-        print("%s - Your IP %s has not changed. Nothing to update!." % (DateTime, ip_addr))
-      elif state == 'UPDATED':
-        print("%s - Your IP has been updated!. Your new IP is: %s ." % (DateTime, ip_addr))
-    elif query_response == 'KO':
-      print("ERROR: bad response recieved. Check your domain and token in your configuration file!.")
+    except requests.exceptions.RequestException as e:
+        print("\n%s" % (e))
+        sys.exit(1)
 
-  except requests.exceptions.Timeout:
-    print("Timed out for request!.")   
-  except requests.exceptions.ConnectionError as e:
-    print("Connection error: %s ." % (e))
+def get_args():
+    """ Set arguments """
+    parser = argparse.ArgumentParser(
+        description='Update your IP address for your duckdns registered domain')
+    parser.add_argument('-f', '--file', required=True, action='store',
+                        help='The configuration file to use')
 
-def GetArgs():
-   parser = argparse.ArgumentParser(
-       description='Update your IP address for your duckdns registered domain')
-   parser.add_argument('-f', '--file', required=True, action='store',
-                       help='The configuration file to use')
-
-   args = parser.parse_args()
-   return args
+    args = parser.parse_args()
+    return args
 
 def main():
-  args = GetArgs()
-  readConfigFile(args.file)
-  SendRequest(url['url'])
+    """ Get arguments and call defined functions """
+    args = get_args()
+    read_config_file(args.file)
+    send_request(URL['url'])
 
 if __name__ == "__main__":
-  main()
+    main()
