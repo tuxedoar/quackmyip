@@ -25,12 +25,10 @@ import sys
 import argparse
 import requests
 
-HEADERS = {'user-agent': ''}
-URL = {}
-DATE_TIME = datetime.now().strftime('%Y/%m/%d %H:%M:%S')
 
 def read_config_file(ini_file):
     """ Read configuration file """
+    URL = {}
     parser = SafeConfigParser()
     # Check if config file exist
     if parser.read(ini_file):
@@ -40,13 +38,17 @@ def read_config_file(ini_file):
         URL_BASE = "https://www.duckdns.org/update?"
         PARAMS = urlencode({'domains': DOMAIN, 'token': TOKEN, 'verbose': VERBOSE})
         URL['url'] = URL_BASE+PARAMS
+        return URL['url']
     else:
         print("\nERROR: Configuration file %s was not found!\n" % (ini_file))
         raise SystemExit
 
+
 def send_request(URL):
     """ Setup the HTTP request to duckdns """
+    HEADERS = {'user-agent': ''}
     response_data = []
+
     try:
         # Make a HTTP GET request
         r = requests.get(URL, verify=True, headers=HEADERS, timeout=3.0)
@@ -55,22 +57,28 @@ def send_request(URL):
         response_data = response_data[0].split('\n')
         # Filter empty strings in list
         response_data = list(filter(None, response_data))
-        # Assign a name for each element of response
-        if "OK" in response_data:
-            for element in response_data:
-                ip_addr, state = response_data[1], response_data[2]
-            # if query_response == 'OK':
-            if state == 'NOCHANGE':
-                print("\n%s - Your IP %s has not changed. Nothing to update!.\n" % (DATE_TIME, ip_addr))
-            elif state == 'UPDATED':
-                print("\n%s - Your IP has been updated!. Your new IP is: %s .\n" % (DATE_TIME, ip_addr))
-        # Assume query_response == 'KO':
-        else:
-            print("\nERROR: bad response recieved. Check your configuration file!.\n")
-
+        return response_data
     except requests.exceptions.RequestException as e:
         print("\n%s" % (e))
         sys.exit(1)
+
+
+def process_http_response(response_data):
+    """ Process the HTTP response """
+    DATE_TIME = datetime.now().strftime('%Y/%m/%d %H:%M:%S')
+    # Assign a name for each element of response
+    if "OK" in response_data:
+        for element in response_data:
+            ip_addr, state = response_data[1], response_data[2]
+        # if query_response == 'OK':
+        if state == 'NOCHANGE':
+            print("\n%s - Your IP %s has not changed. Nothing to update!.\n" % (DATE_TIME, ip_addr))
+        elif state == 'UPDATED':
+            print("\n%s - Your IP has been updated!. Your new IP is: %s .\n" % (DATE_TIME, ip_addr))
+    # Assume query_response == 'KO':
+    else:
+        print("\nERROR: bad response recieved. Check your configuration file!.\n")
+
 
 def get_args():
     """ Set arguments """
@@ -82,11 +90,13 @@ def get_args():
     args = parser.parse_args()
     return args
 
+
 def main():
     """ Get arguments and call defined functions """
     args = get_args()
-    read_config_file(args.file)
-    send_request(URL['url'])
+    URL = read_config_file(args.file)
+    response_data = send_request(URL)
+    process_http_response(response_data)
 
 if __name__ == "__main__":
     main()
