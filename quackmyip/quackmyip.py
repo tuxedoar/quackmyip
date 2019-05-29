@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from urllib.parse import urlencode
 from datetime import datetime
-from configparser import SafeConfigParser
+from configparser import SafeConfigParser, NoOptionError, ParsingError
 import sys
 import argparse
 import requests
@@ -32,17 +32,22 @@ def read_config_file(ini_file):
     parser = SafeConfigParser()
     # Check if config file exist
     if parser.read(ini_file):
-        TOKEN = parser.get('duckdns', 'token')
-        DOMAIN = parser.get('duckdns', 'domain')
-        VERBOSE = "true"
-        URL_BASE = "https://www.duckdns.org/update?"
-        PARAMS = urlencode({'domains': DOMAIN, 'token': TOKEN, 'verbose': VERBOSE})
-        URL['url'] = URL_BASE+PARAMS
-        return URL['url']
+        try:
+            TOKEN = parser.get('duckdns', 'token')
+            DOMAIN = parser.get('duckdns', 'domain')
+            VERBOSE = "true"
+            URL_BASE = "https://www.duckdns.org/update?"
+            PARAMS = urlencode({'domains': DOMAIN, 'token': TOKEN, 'verbose': VERBOSE})
+            URL['url'] = URL_BASE+PARAMS
+            return URL['url']
+        except (NoOptionError, ParsingError) as e:
+            print("\n%s" % (e))
+            sys.exit(1)
     else:
         print("\nERROR: Configuration file %s was not found!\n" % (ini_file))
         raise SystemExit
 
+#configparser.NoOptionError:
 
 def send_request(URL):
     """ Setup the HTTP request to duckdns """
@@ -93,6 +98,7 @@ def get_args():
 
 def main():
     """ Get arguments and call defined functions """
+    sys.tracebacklimit = None
     args = get_args()
     URL = read_config_file(args.file)
     response_data = send_request(URL)
