@@ -1,6 +1,7 @@
-### quackmyip.py
+### quackmyip
 
-This script allows you to keep your public IP address updated, when using the "duckdns" service. See: https://www.duckdns.org/ .  
+This script allows you to keep your public IP address updated, when using the
+[Duck DNS](https://www.duckdns.org/) service.  
 
 ##### Requirements
 In order to work, the latest version of this little script, needs the following Python 3 libraries:
@@ -9,7 +10,7 @@ In order to work, the latest version of this little script, needs the following 
 
 ##### Syntax
 ```
-usage: quackmyip.py [-h] -f FILE
+usage: quackmyip [-h] -f FILE
 
 Update your IP address for your duckdns registered domain
 
