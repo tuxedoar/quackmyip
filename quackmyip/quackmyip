@@ -47,7 +47,6 @@ def read_config_file(ini_file):
         print("\nERROR: Configuration file %s was not found!\n" % (ini_file))
         raise SystemExit
 
-#configparser.NoOptionError:
 
 def send_request(URL):
     """ Setup the HTTP request to duckdns """
