@@ -1,1 +1,2 @@
-import quackmyip
+from __init__ import main
+main()
