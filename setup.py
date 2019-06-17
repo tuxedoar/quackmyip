@@ -13,7 +13,6 @@ setup(
     author='tuxedoar',
     author_email='tuxedoar@gmail.com',
     packages=['quackmyip'],
-    #scripts=['quackmyip/quackmyip']
     entry_points={
         "console_scripts": [
         "quackmyip = quackmyip.quackmyip:main",
