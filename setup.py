@@ -13,7 +13,7 @@ setup(
     author='tuxedoar',
     author_email='tuxedoar@gmail.com',
     packages=['quackmyip'],
-    scripts=['quackmyip/quackmyip'],
+    scripts=['quackmyip/quackmyip.py'],
     install_requires=[
     'urllib3',
     'requests'
