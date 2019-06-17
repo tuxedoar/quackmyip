@@ -8,6 +8,12 @@ In order to work, this program, needs the following Python 3 libraries:
 * [requests](http://docs.python-requests.org/en/master/) (tested with v2.12.4)
 * [urllib3](https://urllib3.readthedocs.io/en/latest/)  (tested with v1.19.1)
 
+#### Installation
+You can use `pip` to install it:
+```
+pip install quackmyip
+```
+
 ##### Syntax
 ```
 usage: quackmyip [-h] FILE
